@@ -1,0 +1,15 @@
+{
+  "extends": "standard",
+  "rules": {
+    "semi": [
+      "error",
+      "always"
+    ],
+    "space-before-function-paren": 0,
+    "comma-dangle": 0,
+    "no-multi-spaces": 0
+  },
+  "globals": {
+    "expect": 0
+  }
+}

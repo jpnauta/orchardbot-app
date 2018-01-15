@@ -1,0 +1,58 @@
+{
+  "name": "orchard-app",
+  "version": "0.0.0",
+  "description": "Application for running Orchard",
+  "scripts": {
+    "start:api": "node bin/api",
+    "start:scheduler": "node bin/scheduler",
+    "start:controller": "node bin/controller",
+    "build": "gulp build",
+    "lint": "npm run lint:src && npm run lint:test",
+    "lint:src": "eslint src",
+    "lint:test": "eslint test",
+    "test": "mocha --recursive test",
+    "test:reporter": "mocha --recursive --reporter mocha-junit-reporter test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpnauta/orchard-app.git"
+  },
+  "author": "Jeremy Nauta",
+  "license": "ISC",
+  "dependencies": {
+    "cron-parser": "2.4.1",
+    "del": "2.2.2",
+    "dotenv": "4.0.0",
+    "enum": "2.4.0",
+    "env-var": "2.4.3",
+    "express": "4.15.2",
+    "gulp-babel": "6.1.2",
+    "lodash": "4.17.4",
+    "moment": "2.18.1",
+    "mongoose": "4.11.6",
+    "node-schedule": "1.2.4",
+    "promise": "8.0.1",
+    "socket.io": "2.0.3",
+    "socket.io-client": "2.0.3",
+    "winston": "2.3.1"
+  },
+  "devDependencies": {
+    "babel-core": "6.24.1",
+    "babel-plugin-istanbul": "4.1.4",
+    "babel-preset-es2015": "6.24.1",
+    "chai": "4.1.1",
+    "eslint": "4.5.0",
+    "eslint-config-standard": "10.2.1",
+    "eslint-plugin-import": "2.7.0",
+    "eslint-plugin-mocha": "4.11.0",
+    "eslint-plugin-node": "5.1.1",
+    "eslint-plugin-promise": "3.5.0",
+    "eslint-plugin-standard": "3.0.1",
+    "factory-lady": "0.1.0",
+    "gulp": "3.9.1",
+    "gulp-babel": "6.1.2",
+    "gulp-sourcemaps": "2.6.0",
+    "mocha": "3.5.0",
+    "mocha-junit-reporter": "1.13.0"
+  }
+}
