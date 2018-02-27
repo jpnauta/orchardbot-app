@@ -1,0 +1,73 @@
+version: '3.3'
+services:
+  api:
+    container_name: api
+    image: api
+    build: &build
+      context: .
+    volumes: &volumes []
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - HOST=0.0.0.0
+      - MONGODB_CONNECTION_STRING=mongodb://mongo/db
+    depends_on: &depends_on
+      - mongo
+    command: ["npm", "run", "start:api"]
+  controller:
+    container_name: controller
+    image: controller
+    build: *build
+    volumes: *volumes
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9001
+    depends_on: *depends_on
+    command: ["npm", "run", "start:controller"]
+  scheduler:
+    container_name: scheduler
+    image: scheduler
+    build: *build
+    volumes: *volumes
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9001
+    depends_on: *depends_on
+    command: ["npm", "run", "start:scheduler"]
+  proxy-master:
+    container_name: proxy-master
+    image: proxy-master
+    build: *build
+    volumes: *volumes
+    ports:
+      - "9002:9002"
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - HOST=0.0.0.0
+    depends_on: *depends_on
+    command: ["npm", "run", "start:proxy-master"]
+  proxy-repeater:
+    container_name: proxy-repeater
+    image: proxy-repeater
+    build: *build
+    volumes: *volumes
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9001
+      - MASTER_URL=http://proxy-master:9002
+    depends_on: *depends_on
+    command: ["npm", "run", "start:proxy-repeater"]
+  mongo:
+    container_name: mongo
+    image: mongo:3
+    ports:
+      - "27017:27017"

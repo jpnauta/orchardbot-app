@@ -1,196 +1,163 @@
+import {describe, it, beforeEach, afterEach} from 'mocha';
+import {expect} from 'chai';
+import {each} from 'lodash';
+
 import {init} from '../../../dist/api/data';
-import {makeAPIClient} from '../../../src/api/clients';
-import * as _ from 'lodash';
+import {makeAPIClient} from '../../../dist/api/clients';
+import {once} from '../../../dist/core/sockets';
+import server from '../../../dist/api/server';
 
 describe('socket server', () => {
-  let server;
   let clients = [];
 
-  function makeClient() {
-    let client = makeAPIClient('http://localhost:3000', {forceNewConnection: true});
+  async function makeClient() {
+    const client = makeAPIClient('http://localhost:9101', {forceNewConnection: true});
 
-    clients.push(client);  // So it can be closed later
+    clients.push(client); // So it can be closed later
+
+    await once(client, 'connect');
 
     return client;
   }
 
-  beforeEach((done) => {
-    clients = [];  // Clear client list
+  beforeEach(async () => {
+    clients = []; // Clear client list
 
-    // start the server
-    server = require('../../../dist/api/server');
+    await init(); // Initialize `DATA`
 
-    init()  // Initialize `DATA`
-      .then(() => {
-        server.listen(3000, () => done());
-      });
+    await new Promise((fulfill) => {
+      server.listen(9101, () => fulfill());
+    });
   });
 
   afterEach(() => {
-    _.each(clients, (client) => {
+    each(clients, (client) => {
       client.close();
     });
     server.close();
   });
 
   describe('waterschedule', () => {
-    it('retrieves current state', (done) => {
+    it('retrieves current state', async () => {
       // GIVEN
-      let client = makeClient();
+      const client = await makeClient();
 
-      client.once('connect', () => {
-        client
-        // WHEN
-          .emit('waterschedule', null)
-          // THEN
-          .on('waterschedule', ({status, data: schedule}) => {
-            expect(status).to.equal('success');
-            expect(schedule._id).to.be.a('string');
-            expect(schedule.openCron).to.be.a('string');
-            expect(schedule.closeCron).to.be.a('string');
-            done();
-          });
-      });
+      client.emit('waterschedule', null);
+
+      // THEN
+      const {status, data: schedule} = await once(client, 'waterschedule');
+
+      expect(status).to.equal('success');
+      expect(schedule._id).to.be.a('string');
+      expect(schedule.openCron).to.be.a('string');
+      expect(schedule.closeCron).to.be.a('string');
     });
 
-    it('updates current schedule', (done) => {
+    it('updates current schedule', async () => {
       // GIVEN 2 socket clients
-      let c1 = makeClient();
+      const c1 = await makeClient();
+      const c2 = await makeClient();
 
-      c1.once('connect', () => {
-        let c2 = makeClient();
+      // WHEN one client updates
+      await c1.emit('waterschedule', {openCron: '0 20 * * *'});
+      const msg = await once(c2, 'waterschedule');
 
-        c2.once('connect', () => {
-          // WHEN one client updates
-          c1.emit('waterschedule', {openCron: '0 20 * * *'});
-
-          // THEN the other client receives the update
-          c2.on('waterschedule', (msg) => {
-            expect(msg).to.nested.include({
-              'status': 'success',
-              'data.openCron': '0 20 * * *',
-              'data.closeCron': '0 20 * * *',
-            });
-            done();
-          });
-        });
+      // THEN the other client receives the update
+      expect(msg).to.nested.include({
+        status: 'success',
+        'data.openCron': '0 20 * * *',
+        'data.closeCron': '0 20 * * *',
       });
     });
 
-    it('rejects invalid data 1', (done) => {
+    it('rejects invalid data 1', async () => {
       // GIVEN
-      let client = makeClient();
+      const client = await makeClient();
 
-      client.once('connect', () => {
-        client
-        // WHEN
-          .emit('waterschedule', {openCron: 'abc * * * *'})
-          // THEN
-          .on('waterschedule', (msg) => {
-            expect(msg).to.deep.include({
-              status: 'failure',
-              error: {
-                errors: {
-                  openCron: '`abc * * * *` is not a cron expression',
-                }
-              }
-            });
-            done();
-          });
+      // WHEN
+      client.emit('waterschedule', {openCron: 'abc * * * *'});
+      const msg = await once(client, 'waterschedule');
+
+      // THEN
+      expect(msg).to.deep.include({
+        status: 'failure',
+        error: {
+          errors: {
+            openCron: '`abc * * * *` is not a cron expression',
+          }
+        }
       });
     });
 
-    it('rejects invalid data 2', (done) => {
+    it('rejects invalid data 2', async () => {
       // GIVEN 2 socket clients
-      let c1 = makeClient();
+      const c1 = await makeClient();
+      const c2 = await makeClient();
 
-      c1.once('connect', () => {
-        let c2 = makeClient();
+      // Ensure client 2 does not receive any updates
+      c2.on('waterschedule', expect.fail);
 
-        c2.once('connect', () => {
-          // WHEN client 1 sends invalid data
-          c1
-            .emit('waterschedule', {openCron: null})
-            // THEN failure is indicated
-            .on('waterschedule', (msg) => {
-              expect(msg).to.nested.include({
-                'status': 'failure',
-                'error.errors.openCron': 'Path `openCron` is required.',
-              });
+      // WHEN client 1 sends invalid data
+      await c1.emit('waterschedule', {openCron: null});
+      const msg = await once(c1, 'waterschedule');
 
-              done();
-            });
-
-          // AND client 2 does not receive any updates
-          c2.on('waterschedule', expect.fail);
-        });
+      // THEN failure is indicated
+      expect(msg).to.nested.include({
+        'status': 'failure',
+        'error.errors.openCron': 'Path `openCron` is required.',
       });
     });
   });
 
   describe('watervalve', () => {
-    it('retrieves current state', (done) => {
+    it('retrieves current state', async () => {
       // GIVEN
-      let client = makeClient();
+      const client = await makeClient();
 
-      client.once('connect', () => {
-        client
-        // WHEN
-          .emit('watervalve', null)
-          // THEN
-          .on('watervalve', ({status, data: valve}) => {
-            expect(status).to.equal('success');
-            expect(valve._id).to.be.a('string');
-            expect(valve.state).to.be.a('string');
-            expect(valve.currentState).to.be.a('string');
-            done();
-          });
-      });
+      // WHEN
+      client.emit('watervalve', null);
+      const {status, data: valve} = await once(client, 'watervalve');
+
+      // THEN
+      expect(status).to.equal('success');
+      expect(valve._id).to.be.a('string');
+      expect(valve.state).to.be.a('string');
+      expect(valve.currentState).to.be.a('string');
     });
 
-    it('updates valve state', (done) => {
+    it('updates valve state', async () => {
       // GIVEN 2 socket clients
-      let c1 = makeClient();
+      const c1 = await makeClient();
+      const c2 = await makeClient();
 
-      c1.once('connect', () => {
-        let c2 = makeClient();
+      // WHEN one client updates
+      c1.emit('watervalve', {state: 'open'});
 
-        c2.once('connect', () => {
-          // WHEN one client updates
-          c1.emit('watervalve', {state: 'open'});
+      // THEN the other client receives the update
+      const msg = await once(c2, 'watervalve');
 
-          // THEN the other client receives the update
-          c2.on('watervalve', (msg) => {
-            expect(msg).to.nested.include({
-              'status': 'success',
-              'data.state': 'open',
-            });
-            done();
-          });
-        });
+      expect(msg).to.nested.include({
+        status: 'success',
+        'data.state': 'open',
       });
     });
 
-    it('rejects invalid data 1', (done) => {
+    it('rejects invalid data 1', async () => {
       // GIVEN
-      let client = makeClient();
+      const client = await makeClient();
 
-      client.once('connect', () => {
-        client
-        // WHEN
-          .emit('watervalve', {state: 'invalid'})
-          // THEN
-          .on('watervalve', (msg) => {
-            expect(msg).to.deep.include({
-              status: 'failure',
-              error: {
-                errors: {
-                  state: '`invalid` is not a valid enum value for path `state`.',
-                }
-              }
-            });
-            done();
-          });
+      // WHEN
+      client.emit('watervalve', {state: 'invalid'});
+      const msg = await once(client, 'watervalve');
+
+      // THEN
+      expect(msg).to.deep.include({
+        status: 'failure',
+        error: {
+          errors: {
+            state: '`invalid` is not a valid enum value for path `state`.',
+          }
+        }
       });
     });
   });

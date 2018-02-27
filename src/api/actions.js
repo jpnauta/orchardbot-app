@@ -1,13 +1,13 @@
 import {makeAPIClient} from '../api/clients';
+import {once} from '../core/sockets';
 
-export function callWaterValve(url, data, done) {
-  let client = makeAPIClient(url);
+export async function callWaterValve(url, data) {
+  const client = makeAPIClient(url);
 
-  client.once('connect', () => {
-    client.emit('watervalve', data);
-    client.on('watervalve', (msg) => {
-      client.disconnect();
-      done(msg);
-    });
-  });
+  await once(client, 'connect');
+  await client.emit('watervalve', data);
+  const msg = await once(client, 'watervalve');
+  client.disconnect();
+
+  return msg;
 }

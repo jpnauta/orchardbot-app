@@ -1,0 +1,27 @@
+{
+  "name": "orchard-app-integration-test",
+  "version": "0.0.0",
+  "description": "Integration tests for Orchardbot app",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jpnauta/orchard-app.git"
+  },
+  "author": "Jeremy Nauta",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "6.24.1",
+    "babel-plugin-istanbul": "4.1.4",
+    "babel-preset-env": "1.6.1",
+    "babel-preset-es2015": "6.24.1",
+    "mocha": "3.5.0",
+    "chai": "4.1.1",
+    "gulp": "3.9.1",
+    "gulp-babel": "6.1.2",
+    "gulp-mocha": "5.0.0",
+    "socket.io-client": "2.0.4"
+  },
+  "dependencies": {}
+}

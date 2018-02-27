@@ -3,11 +3,16 @@ import sourceMaps from 'gulp-sourcemaps';
 import babel from 'gulp-babel';
 import path from 'path';
 import del from 'del';
+import mocha from 'gulp-mocha';
+import eslint from 'gulp-eslint';
+import shell from 'gulp-shell';
 
 const paths = {
-  es6Path: './src/**/*.*',
-  es6: ['./src/**/*.js', '!./src/**/*.json'],
-  es5: './dist',
+  srcPath: './src/**/*.*',
+  src: ['./src/**/*.js', '!./src/**/*.json'],
+  dist: './dist',
+  unitTests: ['./test/unit/**/*.js'],
+  test: ['./test/**/*.js', '!./test/integration/node_modules/**/*'],
   // Must be absolute or relative to source map
   sourceRoot: path.join(__dirname, 'src')
 };
@@ -19,25 +24,56 @@ gulp.task('clean:dist', () => {
 });
 
 gulp.task('build', ['clean:dist', 'copy:nonJs'], () => {
-  return gulp.src(paths.es6)
+  return gulp.src(paths.src)
     .pipe(sourceMaps.init())
     .pipe(babel({
       presets: ['es2015']
     }))
     .pipe(sourceMaps.write('.', {sourceRoot: paths.sourceRoot}))
-    .pipe(gulp.dest(paths.es5));
+    .pipe(gulp.dest(paths.dist));
 });
 
 // Copy all the non JavaScript files to the ./dist folder
 gulp.task('copy:nonJs', () => {
 
-  return gulp.src([paths.es6Path, '!' + paths.es6])
-    .pipe(gulp.dest(paths.es5))
+  return gulp.src([paths.srcPath, '!' + paths.src])
+    .pipe(gulp.dest(paths.dist))
 
 });
 
 gulp.task('watch', ['build'], () => {
-  gulp.watch(paths.es6, ['build']);
+  gulp.watch(paths.src, ['build']);
+});
+
+gulp.task('watch', ['build'], () => {
+  gulp.watch(paths.src, ['build']);
 });
 
 gulp.task('default', ['watch']);
+
+gulp.task('test', ['test:unit']);
+
+gulp.task('test:unit', () => {
+  gulp.src(paths.unitTests, {read: false})
+    .pipe(mocha({
+      reporter: 'nyan', exit: true,
+    }));
+});
+
+gulp.task('test:integration', shell.task('cd test/integration && bash test.sh'));
+
+gulp.task('lint', ['lint:src', 'lint:test']);
+
+gulp.task('lint:src', () => {
+  return gulp.src(paths.src)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});
+
+gulp.task('lint:test', () => {
+  return gulp.src(paths.test)
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError());
+});

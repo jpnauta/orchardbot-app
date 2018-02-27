@@ -1,8 +1,8 @@
-import {DATA} from './data';
-import {Logger} from '../core/config';
-import * as http from 'http';
 import socketIO from 'socket.io';
 import * as _ from 'lodash';
+
+import {DATA} from './data';
+import {Logger} from '../core/config';
 
 const logger = new Logger();
 
@@ -14,18 +14,18 @@ const logger = new Logger();
  * @param key
  */
 function makeDataChannel(io, socket, channel, key) {
-  socket.on(channel, function (msg) {
-    if (msg) {  // Message contains data => update data
+  socket.on(channel, (msg) => {
+    if (msg) { // Message contains data => update data
       logger.log('debug', `(${channel}) Saving...`);
       // Clone existing data and attempt to update it in DB
-      let obj = _.cloneDeep(DATA[key]);
+      const obj = _.cloneDeep(DATA[key]);
       _.assign(obj, msg);
 
       obj.save()
         .then(() => {
           logger.log('debug', `(${channel}) Save complete`);
-          DATA[key] = obj;  // Apply changes to data source
-          io.emit(channel, {  // Emit changes to EVERYONE
+          DATA[key] = obj; // Apply changes to data source
+          io.emit(channel, { // Emit changes to EVERYONE
             status: 'success',
             data: DATA[key],
           });
@@ -39,7 +39,7 @@ function makeDataChannel(io, socket, channel, key) {
             },
           });
         });
-    } else {  // Not data given => send current data
+    } else { // Not data given => send current data
       logger.log('debug', `(${channel}) Sending`);
       socket.emit(channel, {
         status: 'success',
@@ -47,10 +47,9 @@ function makeDataChannel(io, socket, channel, key) {
       });
     }
   });
-};
+}
 
-function setup(app) {
-  const server = http.createServer(app);
+function setup(server) {
   const io = socketIO(server);
 
   // Setup basic express server

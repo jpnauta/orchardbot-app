@@ -1,0 +1,72 @@
+version: '3.3'
+services:
+  integration-tester:
+    build: .
+    links:
+      - api
+      - proxy-master
+    depends_on:
+      - api
+      - controller
+      - scheduler
+      - proxy-master
+      - proxy-repeater
+      - mongo
+  api:
+    build: &build
+      context: ../../
+    volumes: &volumes []
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - HOST=0.0.0.0
+      - PORT=9201
+      - MONGODB_CONNECTION_STRING=mongodb://mongo/db
+    depends_on: &depends_on
+      - mongo
+    command: ["npm", "run", "start:api"]
+  controller:
+    build: *build
+    volumes: *volumes
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9201
+    depends_on: *depends_on
+    command: ["npm", "run", "start:controller"]
+  scheduler:
+    build: *build
+    volumes: *volumes
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9201
+    depends_on: *depends_on
+    command: ["npm", "run", "start:scheduler"]
+  proxy-master:
+    build: *build
+    volumes: *volumes
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - HOST=0.0.0.0
+      - PORT=9202
+    depends_on: *depends_on
+    command: ["npm", "run", "start:proxy-master"]
+  proxy-repeater:
+    build: *build
+    volumes: *volumes
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9201
+      - MASTER_URL=http://proxy-master:9202
+    depends_on: *depends_on
+    command: ["npm", "run", "start:proxy-repeater"]
+  mongo:
+    image: mongo:3

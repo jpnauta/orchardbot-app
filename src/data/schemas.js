@@ -1,11 +1,12 @@
-import {WATER_VALVE_STATES} from '../core/constants';
-import * as validators from './validators';
 import mongoose from 'mongoose';
 
-require('./config');  // Initialize mongodb config
+import {WATER_VALVE_STATES} from '../core/constants';
+import * as validators from './validators';
+
+require('./config'); // Initialize mongodb config
 
 const schemaOpts = {
-  timestamps: true
+  timestamps: true,
 };
 
 /**

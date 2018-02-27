@@ -1,129 +1,121 @@
-import {Factory} from './factories';
+import {describe, it} from 'mocha';
+import {expect} from 'chai';
+
+import {factory} from './factories';
 
 describe('WaterSchedule', () => {
   describe('openCron', () => {
-    it('is required', (done) => {
+    it('is required', async () => {
       // GIVEN
-      Factory.build('WaterSchedule', {openCron: null}, (schedule) => {
-        // WHEN
-        let error = schedule.validateSync();
+      const schedule = await factory.build('WaterSchedule', {openCron: null});
 
-        // THEN
-        expect(error.errors['openCron'].message)
-          .to.be.equal('Path `openCron` is required.');
-        done();
-      });
+      // WHEN
+      const error = schedule.validateSync();
+
+      // THEN
+      expect(error.errors.openCron.message)
+        .to.be.equal('Path `openCron` is required.');
     });
 
-    it('rejects invalid cron expression', (done) => {
+    it('rejects invalid cron expression', async () => {
       // GIVEN
-      Factory.build('WaterSchedule', {openCron: 'abc 12 12'}, (schedule) => {
-        // WHEN
-        let error = schedule.validateSync();
+      const schedule = await factory.build('WaterSchedule', {openCron: 'abc 12 12'});
 
-        // THEN
-        expect(error.errors['openCron'].message)
-          .to.be.equal('`abc 12 12` is not a cron expression');
-        done();
-      });
+      // WHEN
+      const error = schedule.validateSync();
+
+      // THEN
+      expect(error.errors.openCron.message)
+        .to.be.equal('`abc 12 12` is not a cron expression');
     });
 
-    it('accepts valid cron expression', (done) => {
+    it('accepts valid cron expression', async () => {
       // GIVEN
-      Factory.build('WaterSchedule', {openCron: '*/2 * * * *'}, (schedule) => {
-        // WHEN
-        let error = schedule.validateSync();
+      const schedule = await factory.build('WaterSchedule', {openCron: '*/2 * * * *'});
 
-        // THEN
-        expect(error).to.be.equal(undefined);
-        done();
-      });
+      // WHEN
+      const error = schedule.validateSync();
+
+      // THEN
+      expect(error).to.be.equal(undefined);
     });
   });
 
   describe('closeCron', () => {
-    it('is required', (done) => {
+    it('is required', async () => {
       // GIVEN
-      Factory.build('WaterSchedule', {closeCron: null}, (schedule) => {
-        // WHEN
-        let error = schedule.validateSync();
+      const schedule = await factory.build('WaterSchedule', {closeCron: null});
 
-        // THEN
-        expect(error.errors['closeCron'].message)
-          .to.be.equal('Path `closeCron` is required.');
-        done();
-      });
+      // WHEN
+      const error = schedule.validateSync();
+
+      // THEN
+      expect(error.errors.closeCron.message)
+        .to.be.equal('Path `closeCron` is required.');
     });
 
-    it('rejects invalid cron expression', (done) => {
+    it('rejects invalid cron expression', async () => {
       // GIVEN
-      Factory.build('WaterSchedule', {closeCron: 'abc 12 12'}, (schedule) => {
-        // WHEN
-        let error = schedule.validateSync();
+      const schedule = await factory.build('WaterSchedule', {closeCron: 'abc 12 12'});
+      // WHEN
+      const error = schedule.validateSync();
 
-        // THEN
-        expect(error.errors['closeCron'].message)
-          .to.be.equal('`abc 12 12` is not a cron expression');
-        done();
-      });
+      // THEN
+      expect(error.errors.closeCron.message)
+        .to.be.equal('`abc 12 12` is not a cron expression');
     });
 
-    it('accepts valid cron expression', (done) => {
+    it('accepts valid cron expression', async () => {
       // GIVEN
-      Factory.build('WaterSchedule', {closeCron: '*/2 * * * *'}, (schedule) => {
-        // WHEN
-        let error = schedule.validateSync();
+      const schedule = await factory.build('WaterSchedule', {closeCron: '*/2 * * * *'});
+      // WHEN
+      const error = schedule.validateSync();
 
-        // THEN
-        expect(error).to.be.equal(undefined);
-        done();
-      });
+      // THEN
+      expect(error).to.be.equal(undefined);
+
     });
   });
 
   describe('save', () => {
-    it('has createdAt and updatedAt timestamps', (done) => {
+    it('has createdAt and updatedAt timestamps', async () => {
       // GIVEN
-      Factory.build('WaterSchedule', (schedule) => {
-        // WHEN
-        schedule.save()
-          .then(() => {
-            // THEN
-            expect(schedule.updatedAt).to.be.a('date');
-            expect(schedule.createdAt).to.be.a('date');
-            done();
-          });
-      });
+      let schedule = await factory.build('WaterSchedule');
+
+      // WHEN
+      schedule = await schedule.save();
+
+      // THEN
+      expect(schedule.updatedAt).to.be.a('date');
+      expect(schedule.createdAt).to.be.a('date');
     });
   });
-});
 
-describe('WaterValve', () => {
-  describe('state', () => {
-    it('is required', (done) => {
-      // GIVEN
-      Factory.build('WaterValve', {state: null}, (schedule) => {
+  describe('WaterValve', () => {
+    describe('state', () => {
+      it('is required', async () => {
+        // GIVEN
+        const schedule = await factory.build('WaterValve', {state: null});
+
         // WHEN
-        let error = schedule.validateSync();
+        const error = schedule.validateSync();
 
         // THEN
-        expect(error.errors['state'].message)
+        expect(error.errors.state.message)
           .to.be.equal('Path `state` is required.');
-        done();
       });
     });
 
-    it('rejects invalid state', (done) => {
+    it('rejects invalid state', async () => {
       // GIVEN
-      Factory.build('WaterValve', {state: 'invalid'}, (schedule) => {
-        // WHEN
-        let error = schedule.validateSync();
+      const schedule = await factory.build('WaterValve', {state: 'invalid'});
 
-        // THEN
-        expect(error.errors['state'].message)
-          .to.be.equal('`invalid` is not a valid enum value for path `state`.');
-        done();
-      });
+      // WHEN
+      const error = schedule.validateSync();
+
+      // THEN
+      expect(error.errors.state.message)
+        .to.be.equal('`invalid` is not a valid enum value for path `state`.');
     });
   });
 });

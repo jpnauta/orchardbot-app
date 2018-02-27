@@ -1,38 +1,38 @@
 /**
  * Script to start controller
  */
+import {cloneDeep} from 'lodash';
 
 import {API_URL, HARDWARE_CLASS} from './config';
-import * as io from 'socket.io-client';
 import {Logger} from '../core/config';
 import * as interfaces from './interfaces';
+import {makeAPIClient} from '../api/clients';
 
 const logger = new Logger();
 
-let client = io.connect(API_URL, {
-  transports: ['websocket'],
-});
+const client = makeAPIClient(API_URL);
 
+logger.log('info', 'Starting');
 client.once('connect', () => {
-  let hardware = new (interfaces[HARDWARE_CLASS])();
-
-  logger.log('info', 'Starting controller');
+  const hardware = new (interfaces[HARDWARE_CLASS])();
 
   client
     .emit('watervalve', null)
-    .on('watervalve', ({data: valve}) => {
-      let desiredState = valve.state;
+    .on('watervalve', async ({data}) => {
+      const valve = cloneDeep(data);
+      const desiredState = valve.state;
 
       if (desiredState !== hardware.valveState) {
         logger.log('debug', `Changing valve to ${desiredState} state`);
 
         // Change hardware state
-        hardware.setWaterValve(desiredState)
-          .then(() => {
-            // Propagate state change to API
-            valve.currentState = hardware.valveState;
-            client.emit('watervalve', valve);
-          });
+        await hardware.setWaterValve(desiredState);
+
+        // Propagate state change to API
+        valve.currentState = hardware.valveState;
+        client.emit('watervalve', valve);
       }
     });
+
+  logger.log('info', 'Started');
 });

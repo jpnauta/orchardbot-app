@@ -21,9 +21,9 @@ export class Logger extends winston.Logger {
       transports: [
         new winston.transports.Console({
           level: LOG_LEVEL,
-          colorize: true
-        })
-      ]
+          colorize: true,
+        }),
+      ],
     });
   }
 }

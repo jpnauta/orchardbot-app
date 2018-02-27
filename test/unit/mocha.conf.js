@@ -12,5 +12,5 @@ require('babel-core/register');
 global.expect = require('chai').expect;
 
 require('promise/lib/rejection-tracking').enable({
-  allRejections: true
-});  // enable logging of unhandled ReferenceErrors and TypeErrors
+  allRejections: true,
+}); // enable logging of unhandled ReferenceErrors and TypeErrors

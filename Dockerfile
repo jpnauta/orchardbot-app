@@ -1,18 +1,24 @@
+FROM node:8-alpine
+
+RUN mkdir /app/
+WORKDIR /app/
 
 # Install dependencies
-COPY package.json package.json
+COPY package.json .
+COPY package-lock.json .
 RUN npm install
 
-# Copy source/build files
-COPY src/ .
-COPY gulpfile.babel.js gulpfile.babel.js
-COPY .babelrc .babelrc
-
-# Run build
+# Build ./dist folder
+COPY src/ src/
+COPY bin/ bin/
+COPY gulpfile.babel.js .
+COPY .babelrc .
 RUN npm run build
 
-# Remove unecessary files
-RUN rm -rf src/ \
-    && rm package.json \
-    && rm gulpfile.babel.js \
-    && rm .babelrc
+# Remove dev dependencies
+RUN npm prune --production
+RUN rm -r src/ \
+      && rm gulpfile.babel.js \
+      && rm .babelrc
+
+CMD ["npm", "run", "start:api"]

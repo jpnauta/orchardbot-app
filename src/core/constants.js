@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 // or extend node.js with this new type
 Enum.register();
 
-Enum.prototype.getChoices = function () {
+Enum.prototype.getChoices = function getChoices() {
   return _.map(this.enums, 'key');
 };
 

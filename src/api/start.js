@@ -3,16 +3,21 @@
  */
 
 import server from './server';
-import {API_HOST, API_PORT} from './config';
+import {HOST, PORT} from './config';
 import {init} from './data';
 import {Logger} from '../core/config';
 
 const logger = new Logger();
 
-logger.log('info', 'Starting API');
-init()  // Initialize `DATA`
-  .then(() => {
-    server.listen(API_PORT, API_HOST, function () {
-      logger.log('info', `API server listening on ${API_HOST}:${API_PORT}`);
-    });
+async function start() {
+  logger.log('info', 'Starting API');
+  await init(); // Initialize `DATA`
+
+  await new Promise((fulfill) => {
+    server.listen(PORT, HOST, () => fulfill());
   });
+
+  logger.log('info', `Server listening on ${HOST}:${PORT}`);
+}
+
+start();

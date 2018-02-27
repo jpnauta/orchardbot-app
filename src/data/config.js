@@ -1,5 +1,6 @@
-import {env} from '../core/config';
 import mongoose from 'mongoose';
+
+import {env} from '../core/config';
 
 // Parse configuration constants
 export const MONGODB_CONNECTION_STRING = env('MONGODB_CONNECTION_STRING').required().asString();
