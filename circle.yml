@@ -46,7 +46,7 @@ jobs:
           name: Export test results
           command: |
             docker cp api:/app/tmp/ tmp/
-            docker cp api:/app/.nyc_output/ .nyc_output/
+            docker cp api:/app/coverage/ coverage/
 
             bash <(curl -s https://codecov.io/bash)
 

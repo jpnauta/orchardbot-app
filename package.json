@@ -15,7 +15,7 @@
     "lint:test": "gulp lint:test",
     "test": "gulp test",
     "test:unit": "gulp test:unit",
-    "test:unit:ci": "nyc gulp test:unit:ci",
+    "test:unit:ci": "nyc --reporter=lcov gulp test:unit:ci",
     "test:integration": "gulp test:integration"
   },
   "repository": {
