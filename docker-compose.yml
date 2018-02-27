@@ -5,7 +5,7 @@ services:
     image: api
     build: &build
       context: .
-    volumes: &volumes []
+    volumes: &volumes ["./test:/app/test"]
     restart: always
     environment:
       - NODE_ENV=dev

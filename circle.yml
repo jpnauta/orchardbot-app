@@ -45,8 +45,6 @@ jobs:
       - run:
           name: Export coverage results
           command: |
-            docker-compose exec web coverage html --directory=./tmp/django -i
-
             bash <(curl -s https://codecov.io/bash)
 
       - store_artifacts:

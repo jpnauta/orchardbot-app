@@ -16,9 +16,6 @@ COPY .babelrc .
 RUN npm run build
 
 # Remove dev dependencies
-RUN npm prune --production
-RUN rm -r src/ \
-      && rm gulpfile.babel.js \
-      && rm .babelrc
+RUN rm -r src/
 
 CMD ["npm", "run", "start:api"]

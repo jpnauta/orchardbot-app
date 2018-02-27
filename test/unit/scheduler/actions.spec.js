@@ -3,7 +3,7 @@ import {describe, beforeEach, afterEach, it} from 'mocha';
 import {expect} from 'chai';
 
 import {init} from '../../../dist/api/data';
-import {closeWaterValve, getWaterValve, openWaterValve} from '../../../src/scheduler/actions';
+import {closeWaterValve, getWaterValve, openWaterValve} from '../../../dist/scheduler/actions';
 import apiServer from '../../../dist/api/server';
 
 describe('socket server', () => {
