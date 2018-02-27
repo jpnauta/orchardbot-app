@@ -15,7 +15,7 @@
     "lint:test": "gulp lint:test",
     "test": "gulp test",
     "test:unit": "gulp test:unit",
-    "test:unit:ci": "gulp test:unit:ci",
+    "test:unit:ci": "nyc gulp test:unit:ci",
     "test:integration": "gulp test:integration"
   },
   "repository": {
@@ -60,6 +60,7 @@
     "gulp-shell": "0.6.5",
     "gulp-sourcemaps": "2.6.0",
     "mocha": "3.5.0",
-    "mocha-junit-reporter": "1.13.0"
+    "mocha-junit-reporter": "1.13.0",
+    "nyc": "11.4.1"
   }
 }
