@@ -1,5 +1,8 @@
 # orchardbot-app
 
+[![CircleCI](https://circleci.com/gh/jpnauta/orchardbot-app.svg?style=svg)](https://circleci.com/gh/jpnauta/orchardbot-app)
+[![codecov](https://codecov.io/gh/jpnauta/orchardbot-app/branch/master/graph/badge.svg)](https://codecov.io/gh/jpnauta/orchardbot-app)
+
 *Main application for Orchardbot, the robot who can turn on a tap*
 
 ## Design
