@@ -43,8 +43,11 @@ jobs:
             docker-compose exec api npm run test:unit:ci
 
       - run:
-          name: Export coverage results
+          name: Export test results
           command: |
+            docker cp api:/app/tmp/ tmp/
+            docker cp api:/app/.nyc_output/ .nyc_output/
+
             bash <(curl -s https://codecov.io/bash)
 
       - store_artifacts:
