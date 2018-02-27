@@ -10,7 +10,7 @@
 *Yes, I know, this bot is hilariously over-engineered and excessive, 
 but hey, we had some fun 😅*
 
-![Design](https://image.ibb.co/jHM0Zv/Orchardbot_Design.jpg "Design")
+![Design](./docs/design.png)
 
 This bot is designed with micro-services communicating over websockets.
 - The API validates changes and proxies them to any socket clients listening
