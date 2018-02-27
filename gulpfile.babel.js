@@ -60,6 +60,17 @@ gulp.task('test:unit', () => {
     }));
 });
 
+gulp.task('test:unit:ci', () => {
+  gulp.src(paths.unitTests, {read: false})
+    .pipe(mocha({
+      reporter: 'mocha-junit-reporter',
+      reporterOptions: {
+        mochaFile: './tmp/tests.xml',
+      },
+      exit: true,
+    }));
+});
+
 gulp.task('test:integration', shell.task('cd test/integration && bash test.sh'));
 
 gulp.task('lint', ['lint:src', 'lint:test']);

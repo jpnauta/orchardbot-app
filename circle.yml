@@ -1,0 +1,54 @@
+version: 2
+jobs:
+  build:
+    machine:
+      enabled: true
+    working_directory: ~/build
+    environment:
+    steps:
+      - checkout
+
+      - run:
+          name: Configure Docker environment
+          command: |
+            printf "$APP_ENV" > app.env
+
+      - run:
+          name: Install Docker Compose
+          command: |
+            curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+            chmod +x ~/docker-compose
+            mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - run:
+          name: Build Docker image
+          command: |
+            docker-compose build
+
+      - run:
+          name: Start Docker images
+          command: |
+            docker-compose up -d
+
+            # Wait for web container to start
+            until docker-compose exec api npm --version; do
+              >&2 echo "Waiting for web container to start"
+              >&2 echo "$(docker-compose logs)"
+              sleep 5
+            done
+
+      - run:
+          name: Run tests
+          command: |
+            docker-compose exec api npm run test:unit:ci
+
+      - run:
+          name: Export coverage results
+          command: |
+            docker-compose exec web coverage html --directory=./tmp/django -i
+
+            bash <(curl -s https://codecov.io/bash)
+
+      - store_artifacts:
+          path: tmp/
+          destination: tr1

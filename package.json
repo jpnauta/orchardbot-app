@@ -15,6 +15,7 @@
     "lint:test": "gulp lint:test",
     "test": "gulp test",
     "test:unit": "gulp test:unit",
+    "test:unit:ci": "gulp test:unit:ci",
     "test:integration": "gulp test:integration"
   },
   "repository": {
