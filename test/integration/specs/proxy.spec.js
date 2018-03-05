@@ -11,8 +11,8 @@ describe('proxies', () => {
   }
 
   async function once(client, channel) {
-    return new Promise(function (fulfill) {
-      client.once(channel, function (data) {
+    return new Promise((fulfill) => {
+      client.once(channel, (data) => {
         fulfill(data);
       });
     });

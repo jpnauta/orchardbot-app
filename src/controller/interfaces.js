@@ -1,5 +1,3 @@
-import * as Promise from 'promise';
-
 import {Logger} from '../core/config';
 
 const logger = new Logger();

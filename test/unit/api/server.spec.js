@@ -84,8 +84,8 @@ describe('socket server', () => {
         error: {
           errors: {
             openCron: '`abc * * * *` is not a cron expression',
-          }
-        }
+          },
+        },
       });
     });
 
@@ -103,7 +103,7 @@ describe('socket server', () => {
 
       // THEN failure is indicated
       expect(msg).to.nested.include({
-        'status': 'failure',
+        status: 'failure',
         'error.errors.openCron': 'Path `openCron` is required.',
       });
     });
@@ -156,8 +156,8 @@ describe('socket server', () => {
         error: {
           errors: {
             state: '`invalid` is not a valid enum value for path `state`.',
-          }
-        }
+          },
+        },
       });
     });
   });

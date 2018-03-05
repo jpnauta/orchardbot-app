@@ -73,7 +73,6 @@ describe('WaterSchedule', () => {
 
       // THEN
       expect(error).to.be.equal(undefined);
-
     });
   });
 

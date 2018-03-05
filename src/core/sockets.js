@@ -22,9 +22,9 @@ export function interceptAllMessages(socket) {
  * @return {Promise<void>}
  */
 export async function once(client, channel) {
-  return new Promise(function (fulfill) {
+  return new Promise((fulfill) => {
     client.once(channel, (data) => {
       fulfill(data);
-    })
+    });
   });
 }

@@ -5,7 +5,7 @@ import {callWaterValve} from '../api/actions';
  * @param url URL to API server
  */
 export async function getWaterValve(url) {
-  return await callWaterValve(url, null);
+  return callWaterValve(url, null);
 }
 
 /**
@@ -13,7 +13,7 @@ export async function getWaterValve(url) {
  * @param url URL to API server
  */
 export async function openWaterValve(url) {
-  return await callWaterValve(url, {state: 'open', stateLastUpdated: new Date()});
+  return callWaterValve(url, {state: 'open', stateLastUpdated: new Date()});
 }
 
 /**
@@ -21,5 +21,5 @@ export async function openWaterValve(url) {
  * @param url URL to API server
  */
 export async function closeWaterValve(url) {
-  return await callWaterValve(url, {state: 'closed', stateLastUpdated: new Date()});
+  return callWaterValve(url, {state: 'closed', stateLastUpdated: new Date()});
 }
