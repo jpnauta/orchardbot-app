@@ -34,7 +34,7 @@
     "factory-girl": "5.0.2",
     "gulp-babel": "6.1.2",
     "lodash": "4.17.5",
-    "moment": "2.18.1",
+    "moment": "2.21.0",
     "mongoose": "4.11.6",
     "node-schedule": "1.2.4",
     "promise": "^8.0.1",
