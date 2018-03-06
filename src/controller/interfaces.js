@@ -1,3 +1,5 @@
+import {promisify} from 'util';
+
 import {Logger} from '../core/config';
 
 const logger = new Logger();
@@ -35,5 +37,26 @@ export class FakeHardwareInterface extends HardwareInterface {
   // eslint-disable class-methods-use-this
   async $setWaterValve(state) {
     logger.log('debug', `Set hardware valve ${state} state`);
+  }
+}
+
+export class RaspberryPiHardwareInterface extends HardwareInterface {
+  constructor() {
+    super();
+
+    // Initialize input pin
+    const {Gpio} = require('onoff');
+    this.gpio = new Gpio(17, 'out');
+
+    // Revert the input pin on SIGINT
+    process.on('SIGINT', () => {
+      this.led.unexport();
+    });
+  }
+
+  // eslint-disable class-methods-use-this
+  async $setWaterValve(state) {
+    const gpioState = state ? 1 : 0;
+    return promisify(this.gpio.write(gpioState));
   }
 }
