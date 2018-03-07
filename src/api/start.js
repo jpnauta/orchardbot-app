@@ -10,7 +10,7 @@ import {Logger} from '../core/config';
 const logger = new Logger();
 
 async function start() {
-  logger.log('info', 'Starting API');
+  logger.log('info', 'Starting');
   await init(); // Initialize `DATA`
 
   await new Promise((fulfill) => {

@@ -32,7 +32,6 @@
     "env-var": "2.4.3",
     "express": "4.16.2",
     "factory-girl": "5.0.2",
-    "gulp-babel": "6.1.2",
     "lodash": "4.17.5",
     "moment": "2.21.0",
     "mongoose": "4.11.6",

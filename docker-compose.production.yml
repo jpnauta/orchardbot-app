@@ -1,0 +1,50 @@
+version: '2'
+services:
+  api:
+    container_name: api
+    image: api
+    ports:
+      - "9001:9001"
+    build: &build
+      context: .
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - HOST=0.0.0.0
+      - MONGODB_CONNECTION_STRING=mongodb://mongo/db
+    depends_on: &depends_on
+      - mongo
+    command: 'npm run start:api'
+  controller:
+    privileged: true
+    container_name: controller
+    image: controller
+    build: *build
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9001
+      - HARDWARE_CLASS=RaspberryPiHardwareInterface
+    depends_on: *depends_on
+    command: 'npm run start:controller'
+    volumes: ["/sys/class/gpio:/sys/class/gpio"]
+  scheduler:
+    container_name: scheduler
+    image: scheduler
+    build: *build
+    restart: always
+    environment:
+      - NODE_ENV=dev
+      - LOG_LEVEL=debug
+      - API_URL=http://api:9001
+    depends_on: *depends_on
+    command: 'npm run start:scheduler'
+  mongo:
+    container_name: mongo
+    image: partlab/ubuntu-arm-mongodb:latest
+    volumes: ["mongodb:/var/lib/mongodb"]
+volumes:
+  mongodb:
+    external: true

@@ -13,7 +13,7 @@ const logger = new Logger(__filename);
 
 const client = makeAPIClient(API_URL);
 
-logger.log('info', 'Starting');
+logger.log('info', `Connecting to ${API_URL}`);
 client.once('connect', () => {
   /**
    * Tells the API server to open the valve

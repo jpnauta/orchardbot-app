@@ -12,9 +12,10 @@ const logger = new Logger();
 
 const client = makeAPIClient(API_URL);
 
-logger.log('info', 'Starting');
+logger.log('info', `Connecting to ${API_URL}`);
 client.once('connect', () => {
   const hardware = new (interfaces[HARDWARE_CLASS])();
+  logger.log('debug', `Using hardware ${HARDWARE_CLASS}`);
 
   client
     .emit('watervalve', null)
